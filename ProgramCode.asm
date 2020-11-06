@@ -4,3 +4,5 @@ LDA #$05
 STA $0201
 LDA #$08
 STA $0202
+EOR ($2A),Y
+STA ($15,X)

@@ -393,6 +393,7 @@ int getInstruction(ifstream &myfile, void *instructions, int &n, uint8_t auxRegi
     }
     else if (c == '(')
     {
+        myfile.get();
         myfile >> hex >> number;
         if(number > 0xFF)
         {
@@ -407,7 +408,6 @@ int getInstruction(ifstream &myfile, void *instructions, int &n, uint8_t auxRegi
             }
             else
             {
-                myfile.unget();
                 modeCode = M_INDINDEX;
             }
         }
