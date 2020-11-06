@@ -7,6 +7,7 @@ La compilación del programa que generará el volcado hexadecimal se realiza med
 gcc HEXDumpMOS6502.cpp -lstdc++ -o HEXDump
 
 Su ejecución se realiza mediante el siguiente comando, donde ProgramCode.asm es el archivo .ASM que desea leer:
+
 ./HEXDump ProgramCode.asm
 
 Una vez generado el archivo HEXDump.txt, ejecute el emulador usando el siguiente comando:
