@@ -304,7 +304,7 @@ int isRelative(char *upname, void *instructions)
         if(!strcmp(upname,str))
         {
             arr = (uint8_t *) (aregister[1]);
-            if(!arr[M_RELATIVE * 2])
+            if(arr[M_RELATIVE * 2])
             {
                 return 1;
             }
@@ -510,13 +510,9 @@ int main(int argc, char *argv[])
 {
     void *instructions;
     uint8_t *programCode;
-    if(argc != 2)
-    {
-        cout << "Error, ingrese solo el nombre del archivo que contiene las instrucciones" << endl;
-    }
     storageInstructions(instructions);
     printInstructionReport(instructions);
-    int n = generateHEXDump(instructions, programCode, argv[1]);
+    int n = generateHEXDump(instructions, programCode, "ProgramCode.asm");
     printHEXDumpReport(programCode, n);
     return 0;
 }
