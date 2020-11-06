@@ -11,7 +11,8 @@ By: Angel Oropeza León
  * LDA #$01
  * STA $0200
  * Siempre se deben de respetar los espacios, los cuales no pueden
- * ser ni más ni menos, de lo contrario la lectura fallará y los resultados será incorrectos
+ * ser ni más ni menos, de lo contrario la lectura fallará y los resultados será incorrectos.
+ * Revise la imagen Details para conocer la sintaxis adecuada.
  * Para compilarlo usar el siguiente comando:
  * gcc HEXDumpMOS6502.cpp -lstdc++ -o HEXDump
  */
