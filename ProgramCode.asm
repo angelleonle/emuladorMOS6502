@@ -1,11 +1,7 @@
-ASL A
-BNE $2D
-LDA #$22
-LDX $D010
-DEX 
-LDY $02
-JMP $A001
-ADC $C001,X
-LDA $01,X
-EOR ($2A),Y
-STA ($15,X)
+LDX #$00
+INX 
+INY 
+CMP #$02
+BNE _loop 
+LDA #$05
+_loop:
