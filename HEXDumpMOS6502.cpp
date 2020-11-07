@@ -676,11 +676,16 @@ void printHEXDumpReport(uint8_t *programCode, int n)
 
 int main(int argc, char *argv[])
 {
+    if(argc != 2)
+    {
+        cout << "Debe pasar el nombre del archivo .ASM" << endl;
+        exit(1);
+    }
     void *instructions;
     uint8_t *programCode;
     storageInstructions(instructions);
     printInstructionReport(instructions);
-    int n = generateHEXDump(instructions, programCode, "ProgramCode.asm");
+    int n = generateHEXDump(instructions, programCode, argv[1]);
     printHEXDumpReport(programCode, n);
     return 0;
 }
