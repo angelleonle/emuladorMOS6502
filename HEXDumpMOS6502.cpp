@@ -11,8 +11,7 @@ By: Angel Oropeza León
  * LDA #$01
  * STA $0200
  * Siempre se deben de respetar los espacios, los cuales no pueden
- * ser ni más ni menos, de lo contrario la lectura fallará y los resultados será incorrectos.
- * Revise la imagen Details para conocer la sintaxis adecuada.
+ * ser ni más ni menos, de lo contrario la lectura fallará y los resultados será incorrectos
  * Para compilarlo usar el siguiente comando:
  * gcc HEXDumpMOS6502.cpp -lstdc++ -o HEXDump
  */
@@ -27,6 +26,7 @@ using namespace std;
 #define MAX_REGISTERS 10000
 #define MAX_BUFFER 100
 #define MAX_MODES 26
+#define MAX_REL 20
 
 /* MODOS DE DIRECCIONAMIENTO */
 // Modo acumulador
@@ -55,6 +55,16 @@ using namespace std;
 #define M_INDINDEX 11
 // Modo indexado indirecto
 #define M_INDEXINDI 12
+
+typedef struct RelativeMatrix
+{
+    int n;
+    char *tag[MAX_REL];
+    int direction[MAX_REL];
+}
+RelativeMatrix;
+
+RelativeMatrix *relmatrix = (RelativeMatrix *) new RelativeMatrix;
 
 ifstream readFile(char *);
 int readString(ifstream &, char *&, char);
@@ -292,31 +302,18 @@ void freeInstructions(void *instructions)
 }
 
 //HEXDUMP
-int isRelative(char *upname, void *instructions)
+
+int findRelativeTag(char *tagname)
 {
-    char *str;
-    uint8_t *arr;
-    void **registers = (void **) instructions;
-    int i = 0;
-    while(registers[i] != nullptr)
+    int matlen = relmatrix -> n;
+    for(int i = 0; i < matlen; i++)
     {
-        void **aregister = (void **) registers[i];
-        str = (char *) (aregister[0]);
-        if(!strcmp(upname,str))
+        char *aux = (relmatrix -> tag)[i];
+        if(!strcmp(tagname, aux))
         {
-            arr = (uint8_t *) (aregister[1]);
-            if(arr[M_RELATIVE * 2])
-            {
-                return 1;
-            }
-            else
-            {
-                return 0;
-            }
+            return (relmatrix -> direction)[i];
         }
-        i++;
     }
-    return 0;
 }
 
 uint8_t getUpcode(void *instructions, char *upname, int modeCode, int &nbytes)
@@ -365,11 +362,25 @@ int getInstruction(ifstream &myfile, void *instructions, int &n, uint8_t auxRegi
 {
     char *upname;
     int modeCode, number;
+
+
+    char c = myfile.get();
+    if(myfile.eof())
+    {
+        return 1;
+    }
+    myfile.unget();
+    if(c == '_')
+    {
+        char buffer[MAX_BUFFER];
+        myfile.getline(buffer, MAX_BUFFER, '\n');
+        return 0;
+    }
     if(readString(myfile, upname, ' '))
     {
         return 1;
     }
-    char c = myfile.get();
+    c = myfile.get();
     if(c == '\n')
     {
         myfile.unget();
@@ -413,6 +424,15 @@ int getInstruction(ifstream &myfile, void *instructions, int &n, uint8_t auxRegi
             }
         }
     }
+    else if (c == '_')
+    {
+        char *tagname;
+        myfile.unget();
+        readString(myfile, tagname, ' ');
+        modeCode = M_RELATIVE;
+        int aux  = findRelativeTag(tagname);
+        number = aux - n - 2;
+    }
     else
     {
         myfile >> hex >> number;
@@ -454,15 +474,7 @@ int getInstruction(ifstream &myfile, void *instructions, int &n, uint8_t auxRegi
             }
             else
             {
-                myfile.unget();
-                if(isRelative(upname, instructions))
-                {
-                    modeCode = M_RELATIVE;
-                }
-                else
-                {
-                    modeCode = M_PZERO;
-                }
+                modeCode = M_PZERO;
             }
         }
     }
@@ -474,12 +486,178 @@ int getInstruction(ifstream &myfile, void *instructions, int &n, uint8_t auxRegi
     return 0;
 }
 
+
+
+
+
+
+
+
+void incN(int upcode, int nbytes, int &n)
+{
+    nbytes--;
+    n++;
+    if(nbytes == 1)
+    {
+        n++;
+    }
+    else if (nbytes == 2)
+    {
+        n++;
+        n++;
+    }
+}
+
+
+int getTag(ifstream &myfile, void *instructions, int &n)
+{
+    char *upname;
+    int modeCode, number;
+
+    char c = myfile.get();
+    if(myfile.eof())
+    {
+        return 1;
+    }
+    myfile.unget();
+    if(c == '_')
+    {
+        char *tagname;
+        readString(myfile, tagname, ':');
+        int aux = (relmatrix -> n);
+        (relmatrix -> tag)[aux] = tagname;
+        (relmatrix -> direction)[aux] = n;
+        (relmatrix -> n) += 1;
+        char buffer[MAX_BUFFER];
+        myfile.getline(buffer, MAX_BUFFER, '\n');
+        return 0;
+    }
+    readString(myfile, upname, ' ');
+    c = myfile.get();
+    if(c == '\n')
+    {
+        myfile.unget();
+        modeCode = M_IMPLICIT;
+    }
+    else if (c == '#')
+    {
+        modeCode = M_INMEDIATE;
+        if(myfile.peek() == '$')
+        {
+            myfile.get();
+            myfile >> hex >> number;
+        }
+        else
+        {
+            myfile >> dec >> number;
+        }
+    }
+    else if (c == 'A')
+    {
+        modeCode = M_ACUMULADOR;
+    }
+    else if (c == '(')
+    {
+        myfile.get();
+        myfile >> hex >> number;
+        if(number > 0xFF)
+        {
+            modeCode = M_INDIRECT;
+        }
+        else
+        {
+            c = myfile.get();
+            if(c == ',')
+            {
+                modeCode = M_INDEXINDI;
+            }
+            else
+            {
+                modeCode = M_INDINDEX;
+            }
+        }
+    }
+    else if (c == '_')
+    {
+        modeCode = M_RELATIVE;
+    }
+    else
+    {
+        myfile >> hex >> number;
+        if(number > 0xFF)
+        {
+            c = myfile.get();
+            if(c == '\n')
+            {
+                myfile.unget();
+                modeCode = M_ABSOLUTE;
+            }
+            else
+            {
+                c = myfile.get();
+                if(c == 'X')
+                {
+                    modeCode = M_INDEXX;
+                }
+                else
+                {
+                    modeCode = M_INDEXY;
+                }
+            }
+        }
+        else
+        {
+            c = myfile.get();
+            if(c == ',')
+            {
+                c = myfile.get();
+                if(c == 'X')
+                {
+                    modeCode = M_PZEROX;
+                }
+                else
+                {
+                    modeCode = M_PZEROY;
+                }
+            }
+            else
+            {
+                modeCode = M_PZERO;
+            }
+        }
+    }
+    char buffer[MAX_BUFFER];
+    myfile.getline(buffer, MAX_BUFFER, '\n');
+    int nbytes;
+    uint8_t upcode= getUpcode(instructions, upname, modeCode, nbytes);
+    incN(upcode, nbytes, n);
+    return 0;
+}
+
+
+
+
 int generateHEXDump(void *instructions, uint8_t *&programCode, char *filename)
 {
     uint8_t *registers, auxRegisters[MAX_REGISTERS];
     int n = 0;
+    relmatrix -> n = 0;
     ifstream myfile;
     myfile = readFile(filename);
+
+
+    while(1)
+    {
+        if (getTag(myfile, instructions, n))
+        {
+            break;
+        }
+    }
+
+    myfile.clear();
+    myfile.seekg(0, myfile.beg);
+    n = 0;
+
     while(1)
     {
         if (getInstruction(myfile, instructions, n, auxRegisters))
