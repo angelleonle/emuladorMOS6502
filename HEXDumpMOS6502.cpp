@@ -486,13 +486,6 @@ int getInstruction(ifstream &myfile, void *instructions, int &n, uint8_t auxRegi
     return 0;
 }
 
-
-
-
-
-
-
-
 void incN(int upcode, int nbytes, int &n)
 {
     nbytes--;
@@ -507,7 +500,6 @@ void incN(int upcode, int nbytes, int &n)
         n++;
     }
 }
-
 
 int getTag(ifstream &myfile, void *instructions, int &n)
 {
@@ -633,9 +625,6 @@ int getTag(ifstream &myfile, void *instructions, int &n)
     incN(upcode, nbytes, n);
     return 0;
 }
-
-
-
 
 int generateHEXDump(void *instructions, uint8_t *&programCode, char *filename)
 {
