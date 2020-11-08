@@ -1,0 +1,7 @@
+LDA #6
+STA $0400
+LDA #4
+_loop:
+DEC $0400
+CMP $0400
+BNE _loop 
