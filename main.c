@@ -3,6 +3,7 @@
 #include "pipeline_6502.h"
 #include "instructions.h"
 #include "extra_functions.h"
+#include <stdio.h>
 
 int main()
 {
