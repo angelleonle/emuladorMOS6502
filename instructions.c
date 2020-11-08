@@ -1,89 +1,11 @@
 #include <stdio.h>
 #include "extra_functions.h"
-#include "flag_modes.h"
-#include "structures.c"
+#include "flags_modes.c"
+#include "estructuras.c"
 #include "instructions.h"
 
 /*
-AND  AND Memory with Accumulator
-
-    A AND M -> A                 N Z C I D V
-                                 + + - - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    immidiate     AND #oper    29    2    2
-    zeropage      AND oper     25    2    3
-    zeropage,X    AND oper,X   35    2    4
-    absolute      AND oper     2D    3    4
-    absolute,X    AND oper,X   3D    3    4*
-    absolute,Y    AND oper,Y   39    3    4*
-    (indirect,X)  AND (oper,X) 21    2    6
-    (indirect),Y  AND (oper),Y 31    2    5*
-*/
-void AND(int mode ,uint8_t value1, uint8_t value2){
-    int position, position1, position2;
-    position = (value2 << 8) + value1;
-
-    if (value2 == 0xff || value2 == 0x01){
-        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
-        return;
-    }
-
-    switch (mode){
-        case M_INMEDIATO :
-            cpu -> a &= value1;
-            (cpu -> pc) +=2;
-            break;
-
-        case M_PCERO :
-            cpu -> a &= mem -> ram[value1];
-            (cpu -> pc) +=2;
-            break;
-
-        case M_PCEROX :
-            cpu -> a &= (mem -> ram[(value1 + cpu -> x) & 0x00FF]);
-            (cpu -> pc) +=2;
-            break;
-
-        case M_ABSOLUTO :
-            cpu -> a &= (mem -> ram[position]);
-            (cpu -> pc) += 3;
-            break;
-
-        case M_INDICEX :
-            cpu -> a &= (mem -> ram[position + cpu -> x]);
-            (cpu -> pc) +=3;
-            break;
-
-        case M_INDICEY :
-            cpu -> a = cpu ->a & (mem -> ram[(( position+ cpu ->y) )]);
-            (cpu ->pc) +=3;
-            break;
-
-        case M_INDINDEX : // Y
-            
-            position1 = mem -> ram[value1];
-            position2 = mem -> ram[value1 + 1];
-            position = (position2 << 8) + position1;
-            cpu -> a &= (mem -> ram [position + cpu -> y]);
-            (cpu -> pc) += 2;
-            break;
-
-        case M_INDEXINDI : // X
-            position1 = mem -> ram[value1 + cpu -> x] ;
-            position2 = mem -> ram[value1 + cpu -> x + 1];
-            position = (position2 << 8) + position1;
-            cpu -> a &= (mem -> ram[position]);
-            (cpu -> pc) +=2;
-            break;
-    }
-    flagN(cpu -> a);
-    flagZ(cpu -> a);
-}
-
-/*
 ADC  Add Memory to Accumulator with Carry
-
     A + M + C -> A, C             N Z C I D V
                                   + + + - - +
     addressing    assembler    opc  bytes  cyles
@@ -97,17 +19,21 @@ ADC  Add Memory to Accumulator with Carry
     (indirect,X)  ADC (oper,X) 61    2    6
     (indirect),Y  ADC (oper),Y 71    2    5*
 */
+
 void ADC(int mode ,uint8_t value1, uint8_t value2)
 {
     int position, position1, position2;
     position = (value2 << 8 ) + value1;
+
     if (value2 == 0xff || value2 == 0x01){
         printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
         return;
     }
+
     if ( (cpu -> sr) & FLAG_C ) cpu -> a++;
     uint8_t sumando, aux_a = cpu -> a;
     uint16_t suma;
+
     switch (mode){
         case M_INMEDIATO:
             sumando = value1;
@@ -183,15 +109,19 @@ ASL  Shift Left One Bit (Memory or Accumulator)
     absolute      ASL oper     0E    3    6
     absolute,X    ASL oper,X   1E    3    7
 */
+
 void ASL(int mode, uint8_t value1, uint8_t value2)
 {
     int position;
     position = (value2 << 8 ) + value1;
+
     if (value2 == 0xff || value2 == 0x01){
         printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
         return;
     }
+
     uint8_t aux;
+
     switch (mode){
         case M_ACUMULADOR:
             aux = (cpu -> a & 0b10000000);
@@ -223,6 +153,7 @@ void ASL(int mode, uint8_t value1, uint8_t value2)
             cpu -> pc += 3;
             break;
     }
+
     flagN(cpu -> a);
     flagZ(cpu -> a);
     set_flag(FLAG_C, aux);
@@ -237,6 +168,7 @@ BCC  Branch on Carry Clear
     --------------------------------------------
     relative      BCC oper     90    2    2**
 */
+
 void BCC(uint8_t displacement)
 {
     if(((cpu -> sr) & FLAG_C) == 0){
@@ -264,6 +196,7 @@ BCS  Branch on Carry Set
     --------------------------------------------
     relative      BCS oper     B0    2    2**
 */
+
 void BCS(uint8_t displacement)
 {
     if(((cpu -> sr) & FLAG_C) == 1){
@@ -291,6 +224,7 @@ BEQ  Branch on Result Zero
     --------------------------------------------
     relative     BEQ oper      F0    2    2**
 */
+
 void BEQ(uint8_t displacement)
 {
     if(((cpu -> sr) & FLAG_Z) == FLAG_Z){
@@ -318,6 +252,7 @@ BMI  Branch on Result Minus
     --------------------------------------------
     relative      BMI oper     30    2    2**
 */
+
 void BMI(uint8_t displacement)
 {
     if(((cpu -> sr) & FLAG_N) == FLAG_N){
@@ -345,6 +280,7 @@ BNE  Branch on Result not Zero
     --------------------------------------------
     relative      BNE oper     D0    2    2**
 */
+
 void BNE(uint8_t displacement)
 {
     if(((cpu -> sr) & FLAG_Z) == 0){
@@ -372,6 +308,7 @@ BPL  Branch on Result Plus
     --------------------------------------------
     relative      BPL oper     10    2    2**
 */
+
 void BPL(uint8_t displacement)
 {
     if(((cpu -> sr) & FLAG_N) == 0){
@@ -399,6 +336,7 @@ BVC  Branch on Overflow Clear
     --------------------------------------------
     relative      BVC oper     50    2    2**
 */
+
 void BVC(uint8_t displacement)
 {
     if(((cpu -> sr) & FLAG_V) == 0){
@@ -427,6 +365,7 @@ BVS  Branch on Overflow Set
     relative      BVC oper     70    2    2**
 
 */
+
 void BVS(uint8_t displacement)
 {
     if(((cpu -> sr) & FLAG_V) == FLAG_V){
@@ -457,23 +396,29 @@ BIT  Test Bits in Memory with Accumulator
     zeropage      BIT oper     24    2    3
     absolute      BIT oper     2C    3    4
 */
+
 void BIT(int mode ,uint8_t value1, uint8_t value2){
     int position = (value2 << 8 ) + value1;
+
     if (value2 == 0xff || value2 == 0x01){
         printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
         return;
     }
+
     uint8_t memory_value;
+
     switch (mode){
         case M_PCERO:
             memory_value = mem -> ram[value1];
             cpu -> pc += 2;
             break;
+
         case M_ABSOLUTO:
             memory_value = mem -> ram[position];
             (cpu -> pc) += 3;
             break;
     }
+
     set_flag(FLAG_V, (memory_value & 0b01000000));
     set_flag(FLAG_N, (memory_value & 0b10000000));
     flagZ( cpu -> a & memory_value );
@@ -488,8 +433,10 @@ BRK  Force Break
     --------------------------------------------
     implied       BRK          00    1    7
 */
+
 void BRK()
 {
+    (cpu -> ins) = 0x00;
     (cpu -> pc) += 1;
     // Bandera interrupción
     set_flag(FLAG_I, 1);
@@ -509,8 +456,10 @@ CLC  Clear Carry Flag
     --------------------------------------------
     implied       CLC          18    1    2
 */
+
 void CLC()
 {
+    (cpu -> ins) = 0x18;
     (cpu -> pc) += 1;
     // Bandera acarreo
     set_flag(FLAG_C, 0);
@@ -525,8 +474,10 @@ CLD  Clear Decimal mode
     --------------------------------------------
     implied       CLD          D8    1    2
 */
+
 void CLD()
 {
+    (cpu -> ins) = 0xD8;
     (cpu -> pc) += 1;
     // Bandera decimal
     set_flag(FLAG_D, 0);
@@ -541,6 +492,7 @@ CLI  Clear Interrupt Disable Bit
     --------------------------------------------
     implied       CLI          58    1    2
 */
+
 void CLI()
 {
     (cpu -> pc) += 1;
@@ -557,6 +509,7 @@ CLV  Clear Overflow Flag
     --------------------------------------------
     implied       CLV          B8    1    2
 */
+
 void CLV()
 {
     (cpu -> pc) += 1;
@@ -580,6 +533,7 @@ CMP  Compare Memory with Accumulator
     (indirect,X)  CMP (oper,X) C1    2    6
     (indirect),Y  CMP (oper),Y D1    2    5*
 */
+
 void CMP(int mode, uint8_t value1, uint8_t value2){
     int position, position1, position2;
     position = (value2 << 8) + value1;
@@ -654,6 +608,7 @@ CPX  Compare Memory and Index X
     zeropage      CPX oper     E4    2    3
     absolute      CPX oper     EC    3    4
 */
+
 void CPX(int mode, uint8_t value1, uint8_t value2){
     int position;
     position = (value2 << 8) + value1;
@@ -697,13 +652,16 @@ CPY  Compare Memory and Index Y
     zeropage      CPY oper     C4    2    3
     absolute      CPY oper     CC    3    4
 */
+
 void CPY(int mode, uint8_t value1, uint8_t value2){
     int position;
     position = (value2 << 8) + value1;
+
     if (value2 == 0xff || value2 == 0x01){
         printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
         return;
     }
+
     uint8_t aux;
     switch (mode){
         case M_INMEDIATO:
@@ -738,13 +696,16 @@ DEC  Decrement Memory by One
     absolute      DEC oper     CE    3    6
     absolute,X    DEC oper,X   DE    3    7
 */
+
 void DEC(int mode,uint8_t value1, uint8_t value2){
     int position;
     position = (value2 << 8) + value1;
+
     if (value2 == 0xff || value2 == 0x01){
         printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
         return;
     }
+
     uint8_t aux;
     switch (mode){
         case M_PCERO:
@@ -784,6 +745,7 @@ DEX  Decrement Index X by One
     --------------------------------------------
     implied       DEC          CA    1    2
 */
+
 void DEX()
 {
     (cpu -> x) -= 1;
@@ -801,6 +763,7 @@ DEY  Decrement Index Y by One
     --------------------------------------------
     implied       DEC          88    1    2
 */
+
 void DEY()
 {
     (cpu -> y) -= 1;
@@ -825,6 +788,7 @@ EOR  Exclusive-OR Memory with Accumulator
     (indirect,X)  EOR (oper,X) 41    2    6
     (indirect),Y  EOR (oper),Y 51    2    5*
 */
+
 void EOR(int mode, uint8_t value1, uint8_t value2){
     int position, position1, position2;
     position = (value2 << 8) + value1;
@@ -885,54 +849,6 @@ void EOR(int mode, uint8_t value1, uint8_t value2){
     flagZ(cpu ->a);
 }
 
-
-
-/*
-INC  Increment Memory by One
-
-    M + 1 -> M                   N Z C I D V
-                                 + + - - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    zeropage      INC oper     E6    2    5
-    zeropage,X    INC oper,X   F6    2    6
-    absolute      INC oper     EE    3    6
-    absolute,X    INC oper,X   FE    3    7
-*/
-void INC(int mode, uint8_t value1, uint8_t value2){
-    int position;
-    position = (value2 << 8) + value1;
-
-    if (value2 == 0xff || value2 == 0x01){
-        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
-        return;
-    }
-    uint8_t aux;
-    switch (mode){
-        case M_PCERO:
-            mem -> ram[value1] = mem -> ram[value1] + 1;
-            aux = mem -> ram[value1];
-            break;
-
-        case M_PCEROX:
-            mem -> ram[(value1+cpu -> x) & 0x00FF] += 1;
-            aux = mem -> ram[(value1 + cpu -> x) & 0x00FF];
-            break;
-
-        case M_ABSOLUTO:
-            mem -> ram[position] += 1;
-            aux = mem -> ram[position];
-            break;
-
-        case M_INDICEX:
-            mem -> ram[position+cpu -> x] += 1;
-            aux = mem -> ram[position + cpu -> x];
-            break;
-    }
-    flagZ(aux);
-    flagN(aux);
-}
-
 /*
 INX  Increment Index X by One
 
@@ -942,6 +858,7 @@ INX  Increment Index X by One
     --------------------------------------------
     implied       INX          E8    1    2
 */
+
 void INX()
 {
     (cpu -> pc) += 1;
@@ -959,6 +876,7 @@ INY  Increment Index Y by One
     --------------------------------------------
     implied       INY          C8    1    2
 */
+
 void INY()
 {
     (cpu -> y) += 1;
@@ -977,6 +895,7 @@ JMP  Jump to New Location
     absolute      JMP oper     4C    3    3
     indirect      JMP (oper)   6C    3    5
 */
+
 void JMP(int mode, uint16_t direction){
     uint8_t lower, upper;
 
@@ -1003,6 +922,7 @@ JSR  Jump to New Location Saving Return Address
     --------------------------------------------
     absolute      JSR oper     20    3    6
 */
+
 void JSR(uint16_t direction){
     uint8_t upper, lower;
     //save return address
@@ -1033,6 +953,7 @@ LDA  Load Accumulator with Memory
     (indirect,X)  LDA (oper,X) A1    2    6
     (indirect),Y  LDA (oper),Y B1    2    5*
 */
+
 void LDA(int mode, uint8_t value1, uint8_t value2)
 {
     int position, position1, position2;
@@ -1096,58 +1017,6 @@ void LDA(int mode, uint8_t value1, uint8_t value2)
     flagN(cpu ->a);
 }
 
-
-/*
-LDX  Load Index X with Memory
-
-    M -> X                      N Z C I D V
-                                + + - - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    immidiate     LDX #oper    A2    2    2
-    zeropage      LDX oper     A6    2    3
-    zeropage,Y    LDX oper,Y   B6    2    4
-    absolute      LDX oper     AE    3    4
-    absolute,Y    LDX oper,Y   BE    3    4*
-*/
-void LDX(int mode, uint8_t value1, uint8_t value2){
-    int position;
-    position = (value2 << 8) + value1;
-    if (value2 == 0xff || value2 == 0x01){
-        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
-        return;
-    }
-    switch(mode){
-        case M_INMEDIATO:
-            cpu -> x = value1;
-            cpu -> pc += 2;
-            break;
-
-        case M_PCERO:
-            cpu -> x = mem -> ram[value1];
-            cpu -> pc += 2;
-            break;
-
-        case M_PCEROY:
-            cpu -> x = mem -> ram[(value1 + cpu -> y) & 0x00FF];
-            cpu -> pc += 2;
-            break;
-
-        case M_ABSOLUTO:
-            cpu -> x = mem -> ram[position];
-            cpu -> pc += 3;
-            break;
-
-        case M_INDICEY:
-            cpu -> x = mem -> ram[position + cpu -> y];
-            cpu -> pc += 3;
-            break;
-    }
-
-    flagZ(cpu -> x);
-    flagN(cpu -> x);
-}
-
 /*
 LDY  Load Index Y with Memory
 
@@ -1161,13 +1030,16 @@ LDY  Load Index Y with Memory
     absolute      LDY oper     AC    3    4
     absolute,X    LDY oper,X   BC    3    4*
 */
+
 void LDY(int mode, uint8_t value1, uint8_t value2){
     int position;
     position = (value2 << 8) + value1;
+
     if (value2 == 0xff || value2 == 0x01){
         printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
         return;
     }
+
     switch(mode){
         case M_INMEDIATO:
             cpu -> y = value1;
@@ -1207,6 +1079,7 @@ NOP  No Operation
     --------------------------------------------
     implied       NOP          EA    1    2
 */
+
 void NOP()
 {
     (cpu -> pc) += 1;
@@ -1225,13 +1098,16 @@ LSR  Shift One Bit Right (Memory or Accumulator)
     absolute      LSR oper     4E    3    6
     absolute,X    LSR oper,X   5E    3    7
 */
+
 void LSR(int mode, uint8_t value1, uint8_t value2){
     int position;
     position = (value2 << 8) + value1;
+
     if (value2 == 0xff || value2 == 0x01){
         printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
         return;
     }
+
     uint8_t aux;
 
     switch (mode){
@@ -1286,13 +1162,16 @@ ORA  OR Memory with Accumulator
     (indirect,X)  ORA (oper,X) 01    2    6
     (indirect),Y  ORA (oper),Y 11    2    5*
 */
+
 void ORA(int mode, uint8_t value1, uint8_t value2){
     int position, position1, position2;
     position = (value2 << 8) + value1;
+
     if (value2 == 0xff || value2 == 0x01){
         printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
         return;
     }
+
     switch(mode){
         case M_INMEDIATO :
             cpu -> a = cpu -> a | value1;
@@ -1351,6 +1230,7 @@ PHA  Push Accumulator on Stack
     --------------------------------------------
     implied       PHA          48    1    3
 */
+
 void PHA()
 {
     (cpu -> pc) += 1;
@@ -1367,6 +1247,7 @@ PHP  Push Processor Status on Stack
     --------------------------------------------
     implied       PHP          08    1    3
 */
+
 void PHP()
 {
     (mem -> ram[0x0100 + (cpu -> sp)]) = (cpu -> sr);
@@ -1383,6 +1264,7 @@ PLA  Pull Accumulator from Stack
     --------------------------------------------
     implied       PLA          68    1    4
 */
+
 void PLA()
 {
     (cpu -> a) = (mem -> ram[0x0100 + (cpu -> sp)]);
@@ -1399,6 +1281,7 @@ PLP  Pull Processor Status from Stack
     --------------------------------------------
     implied       PLP          28    1    4
 */
+
 void PLP(){
     (cpu -> sr) = mem -> ram[0x0100+(cpu -> sp)];
     (cpu -> sp) += 1;
@@ -1418,15 +1301,20 @@ ROL  Rotate One Bit Left (Memory or Accumulator)
     absolute      ROL oper     2E    3    6
     absolute,X    ROL oper,X   3E    3    7
 */
+
 void ROL(int mode, uint8_t value1, uint8_t value2){
     int position;
     position = (value2 << 8) + value1;
+
     if (value2 == 0xff || value2 == 0x01){
         printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
         return;
     }
+
     int numUlt, carry;
+
     carry= (cpu ->sr & FLAG_C); // Carry
+
     switch (mode){
         case M_ACUMULADOR:
             numUlt = cpu -> a & 0b10000000;
@@ -1472,15 +1360,19 @@ ROR  Rotate One Bit Right (Memory or Accumulator)
     absolute      ROR oper     6E    3    6
     absolute,X    ROR oper,X   7E    3    7
 */
+
 void ROR(int mode, uint8_t value1, uint8_t value2){
     int position;
     position = (value2 << 8) + value1;
+
     if (value2 == 0xff || value2 == 0x01){
         printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
         return;
     }
+
     int numUlt, carry;
     carry= (cpu -> sr & FLAG_C) ;
+
     switch (mode){
         case M_ACUMULADOR: // ROR  del acumulador
             numUlt = (cpu -> a & FLAG_C);
@@ -1526,6 +1418,7 @@ RTI  Return from Interrupt
     --------------------------------------------
     implied       RTI          40    1    6
 */
+
 void RTI(){
     PLP(); //pull SR
     (cpu -> pc) = mem -> ram[0x0100 + (cpu -> sp)];
@@ -1542,6 +1435,7 @@ RTS  Return from Subroutine
     --------------------------------------------
     implied       RTS          60    1    6
 */
+
 void RTS(){
     (cpu -> pc) = mem -> ram[0x0100 + (cpu -> sp)];
     (cpu -> sp) += 1;
@@ -1549,28 +1443,488 @@ void RTS(){
 }
 
 /*
-SBC  Subtract Memory from Accumulator with Borrow
+SEC  Set Carry Flag
 
-    A - M - C -> A                 N Z C I D V
-                                   + + + - - +
+    1 -> C                      N Z C I D V
+                                - - 1 - - -
     addressing    assembler    opc  bytes  cyles
     --------------------------------------------
-    immidiate     SBC #oper    E9    2     2
-    zeropage      SBC oper     E5    2     3
-    zeropage,X    SBC oper,X   F5    2     4
-    absolute      SBC oper     ED    3     4
-    absolute,X    SBC oper,X   FD    3     4*
-    absolute,Y    SBC oper,Y   F9    3     4*
-    (indirect,X)  SBC (oper,X) E1    2     6
-    (indirect),Y  SBC (oper),Y F1    2     5*
+    implied       SEC          38    1    2
 */
-void SBC (int mode, uint8_t value1, uint8_t value2) {
+
+void SEC(){
+    (cpu -> pc) += 1;
+    set_flag(FLAG_C, 1);
+}
+
+/*
+SED  Set Decimal Flag
+
+    1 -> D                      N Z C I D V
+                                - - - - 1 -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    implied       SED          F8    1    2
+*/
+
+void SED(){
+    (cpu -> pc) += 1;
+    set_flag(FLAG_D, 1);
+}
+
+/*
+SEI  Set Interrupt Disable Status
+
+    1 -> I                      N Z C I D V
+                                - - - 1 - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    implied       SEI          78    1    2
+*/
+
+void SEI(){
+    (cpu -> pc) += 1;
+    set_flag(FLAG_I, 1);
+}
+
+/*
+STA  Store Accumulator in Memory
+
+    A -> M                      N Z C I D V
+                                - - - - - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    zeropage      STA oper     85    2    3
+    zeropage,X    STA oper,X   95    2    4
+    absolute      STA oper     8D    3    4
+    absolute,X    STA oper,X   9D    3    5
+    absolute,Y    STA oper,Y   99    3    5
+    (indirect,X)  STA (oper,X) 81    2    6
+    (indirect),Y  STA (oper),Y 91    2    6
+*/
+
+void STA(int mode ,uint8_t value1, uint8_t value2){
     int position, position1, position2;
     position = (value2 << 8) + value1;
+
     if (value2 == 0xff || value2 == 0x01){
         printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
         return;
     }
+
+    switch (mode){
+        case M_PCERO:
+            mem -> ram[value1] = cpu -> a;
+            cpu -> pc += 2;
+            break;
+
+        case M_PCEROX:
+            mem -> ram[(value1 + cpu -> x)& 0x00FF] = cpu -> a;
+            (cpu -> pc) += 2;
+            break;
+
+        case M_ABSOLUTO:
+            mem -> ram[position] = cpu -> a;
+            (cpu -> pc) += 3;
+            break;
+
+        case M_INDICEX:
+            mem -> ram[position + cpu -> x] = cpu -> a;
+            cpu -> pc += 3;
+            break;
+
+        case M_INDICEY:
+            mem -> ram[position + cpu -> y] = cpu -> a;
+            cpu -> pc += 3;
+            break;
+
+        case M_INDINDEX:
+            position1 = mem -> ram[value1];
+            position2 = mem -> ram[value1 + 1];
+            position = (position2 << 8) + position1;
+            mem -> ram [mem -> ram[position + cpu -> y]] = cpu -> a;
+            cpu -> pc += 2;
+            break;
+
+        case M_INDEXINDI:
+            position1 = mem -> ram[value1 + cpu -> x];
+            position2 = mem -> ram[value1 + cpu -> x + 1];
+            position = (position2 << 8) + position1;
+            mem -> ram[mem -> ram[position]] = cpu -> a;
+            cpu -> pc += 2;
+            break;
+    }
+}
+
+/*
+STX  Store Index X in Memory
+
+    X -> M                      N Z C I D V
+                                - - - - - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    zeropage      STX oper     86    2    3
+    zeropage,Y    STX oper,Y   96    2    4
+    absolute      STX oper     8E    3    4
+*/
+
+void STX (int mode, uint8_t value1, uint8_t value2) {
+    int position;
+    position = (value2 << 8) + value1;
+
+    if (value2 == 0xff || value2 == 0x01){
+        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
+        return;
+    }
+
+    switch (mode)
+    {
+        case M_PCERO:
+            mem -> ram[value1] = cpu -> x;
+            (cpu -> pc) += 2;
+            break;
+
+        case M_PCEROY:
+            mem -> ram[(value1 + cpu -> y) & 0x00FF] = cpu -> x;
+            (cpu -> pc) += 2;
+            break;
+
+        case M_ABSOLUTO:
+            mem -> ram[position] = cpu -> x;
+            (cpu -> pc) += 3;
+            break;
+    }
+}
+
+/*
+STY  Sore Index Y in Memory
+
+    Y -> M                      N Z C I D V
+                                - - - - - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    zeropage      STY oper     84    2    3
+    zeropage,X    STY oper,X   94    2    4
+    absolute      STY oper     8C    3    4
+*/
+
+void STY(int mode, uint8_t value1, uint8_t value2){
+    int position;
+    position = (value2 << 8) + value1;
+
+    if (value2 == 0xff || value2 == 0x01){
+        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
+        return;
+    }
+
+    switch(mode){
+        case M_PCERO :
+            mem -> ram[value1] = cpu -> y;
+            (cpu -> pc) +=2;
+            break;
+
+        case M_PCEROX :
+            mem -> ram[(value1 + cpu -> x) & 0x00FF] = cpu -> y;
+            (cpu -> pc) +=2;
+            break;
+
+        case M_ABSOLUTO :
+            mem -> ram[position] = cpu -> y;
+            (cpu -> pc) +=3;
+            break;
+    }
+}
+
+/*
+TAX  Transfer Accumulator to Index X
+
+    A -> X                      N Z C I D V
+                                + + - - - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    implied       TAX          AA    1    2
+*/
+
+void TAX(){
+    (cpu -> x) = (cpu -> a);
+    flagN(cpu -> x);
+    flagZ(cpu -> x);
+    (cpu -> pc) += 1;
+}
+
+/*
+TAY  Transfer Accumulator to Index Y
+
+    A -> Y                      N Z C I D V
+                                + + - - - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    implied       TAY          A8    1    2
+*/
+
+void TAY(){
+    (cpu -> y) = (cpu -> a);
+    flagN(cpu -> y);
+    flagZ(cpu -> y);
+    (cpu -> pc) += 1;
+}
+
+/*
+TSX  Transfer Stack Pointer to Index X
+
+    SP -> X                     N Z C I D V
+                                + + - - - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    implied       TSX          BA    1    2
+*/
+
+void TSX(){
+    (cpu -> pc) += 1;
+    (cpu -> x) = (cpu -> sp);
+    flagN(cpu -> x);
+    flagZ(cpu -> x);
+}
+
+/*
+TXA  Transfer Index X to Accumulator
+
+    X -> A                      N Z C I D V
+                                + + - - - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    implied       TXA          8A    1    2
+*/
+
+void TXA(){
+    (cpu -> a) = (cpu -> x);
+    flagN(cpu -> a);
+    flagZ(cpu -> a);
+    (cpu -> pc) +=1;
+}
+
+/*
+TXS  Transfer Index X to Stack Register
+
+    X -> SP                     N Z C I D V
+                                - - - - - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    implied       TXS          9A    1    2
+*/
+
+void TXS(){
+    (cpu -> sp) = (cpu -> x);
+    (cpu -> pc) += 1;
+}
+
+/*
+TYA  Transfer Index Y to Accumulator
+
+    Y -> A                      N Z C I D V
+                                + + - - - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    implied       TYA          98    1    2
+*/
+
+void TYA(){
+    (cpu -> a) = (cpu -> y);
+    flagN(cpu -> a);
+    flagZ(cpu -> a);
+    (cpu -> pc) += 1;
+}
+
+/*
+AND  AND Memory with Accumulator
+
+    A AND M -> A                 N Z C I D V
+                                 + + - - - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    immidiate     AND #oper    29    2    2
+    zeropage      AND oper     25    2    3
+    zeropage,X    AND oper,X   35    2    4
+    absolute      AND oper     2D    3    4
+    absolute,X    AND oper,X   3D    3    4*
+    absolute,Y    AND oper,Y   39    3    4*
+    (indirect,X)  AND (oper,X) 21    2    6
+    (indirect),Y  AND (oper),Y 31    2    5*
+*/
+
+void AND(int mode ,uint8_t value1, uint8_t value2){
+    int position, position1, position2;
+    position = (value2 << 8) + value1;
+
+    if (value2 == 0xff || value2 == 0x01){
+        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
+        return;
+    }
+
+    switch (mode){
+        case M_INMEDIATO :
+            cpu -> a &= value1;
+            (cpu -> pc) +=2;
+            break;
+
+        case M_PCERO :
+            cpu -> a &= mem -> ram[value1];
+            (cpu -> pc) +=2;
+            break;
+
+        case M_PCEROX :
+            cpu -> a &= (mem -> ram[(value1 + cpu -> x) & 0x00FF]);
+            (cpu -> pc) +=2;
+            break;
+
+        case M_ABSOLUTO :
+            cpu -> a &= (mem -> ram[position]);
+            (cpu -> pc) += 3;
+            break;
+
+        case M_INDICEX :
+            cpu -> a &= (mem -> ram[position + cpu -> x]);
+            (cpu -> pc) +=3;
+            break;
+
+        case M_INDICEY :
+            cpu -> a = cpu ->a & (mem -> ram[(( position+ cpu ->y) )]);
+            (cpu ->pc) +=3;
+            break;
+
+        case M_INDINDEX : // Y
+            
+            position1 = mem -> ram[value1];
+            position2 = mem -> ram[value1 + 1];
+            position = (position2 << 8) + position1;
+            cpu -> a &= (mem -> ram [position + cpu -> y]);
+            (cpu -> pc) += 2;
+            break;
+
+        case M_INDEXINDI : // X
+            position1 = mem -> ram[value1 + cpu -> x] ;
+            position2 = mem -> ram[value1 + cpu -> x + 1];
+            position = (position2 << 8) + position1;
+            cpu -> a &= (mem -> ram[position]);
+            (cpu -> pc) +=2;
+            break;
+    }
+    flagN(cpu -> a);
+    flagZ(cpu -> a);
+}
+
+/*
+LDX  Load Index X with Memory
+
+    M -> X                      N Z C I D V
+                                + + - - - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    immidiate     LDX #oper    A2    2    2
+    zeropage      LDX oper     A6    2    3
+    zeropage,Y    LDX oper,Y   B6    2    4
+    absolute      LDX oper     AE    3    4
+    absolute,Y    LDX oper,Y   BE    3    4*
+*/
+
+void LDX(int mode, uint8_t value1, uint8_t value2){
+    int position;
+    position = (value2 << 8) + value1;
+
+    if (value2 == 0xff || value2 == 0x01){
+        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
+        return;
+    }
+
+    switch(mode){
+        case M_INMEDIATO:
+            cpu -> x = value1;
+            cpu -> pc += 2;
+            break;
+
+        case M_PCERO:
+            cpu -> x = mem -> ram[value1];
+            cpu -> pc += 2;
+            break;
+
+        case M_PCEROY:
+            cpu -> x = mem -> ram[(value1 + cpu -> y) & 0x00FF];
+            cpu -> pc += 2;
+            break;
+
+        case M_ABSOLUTO:
+            cpu -> x = mem -> ram[position];
+            cpu -> pc += 3;
+            break;
+
+        case M_INDICEY:
+            cpu -> x = mem -> ram[position + cpu -> y];
+            cpu -> pc += 3;
+            break;
+    }
+
+    flagZ(cpu -> x);
+    flagN(cpu -> x);
+}
+
+/*
+INC  Increment Memory by One
+
+    M + 1 -> M                   N Z C I D V
+                                 + + - - - -
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    zeropage      INC oper     E6    2    5
+    zeropage,X    INC oper,X   F6    2    6
+    absolute      INC oper     EE    3    6
+    absolute,X    INC oper,X   FE    3    7
+*/
+
+void INC(int mode, uint8_t value1, uint8_t value2){
+    int position;
+    position = (value2 << 8) + value1;
+
+    if (value2 == 0xff || value2 == 0x01){
+        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
+        return;
+    }
+
+    uint8_t aux;
+
+    switch (mode){
+        case M_PCERO:
+            mem -> ram[value1] = mem -> ram[value1] + 1;
+            aux = mem -> ram[value1];
+            break;
+
+        case M_PCEROX:
+            mem -> ram[(value1+cpu -> x) & 0x00FF] += 1;
+            aux = mem -> ram[(value1 + cpu -> x) & 0x00FF];
+            break;
+
+        case M_ABSOLUTO:
+            mem -> ram[position] += 1;
+            aux = mem -> ram[position];
+            break;
+
+        case M_INDICEX:
+            mem -> ram[position+cpu -> x] += 1;
+            aux = mem -> ram[position + cpu -> x];
+            break;
+    }
+    flagZ(aux);
+    flagN(aux);
+}
+
+void SBC (int mode, uint8_t value1, uint8_t value2) {
+    int position, position1, position2;
+    position = (value2 << 8) + value1;
+
+    if (value2 == 0xff || value2 == 0x01){
+        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
+        return;
+    }
+
     uint8_t carry = ((cpu -> sr) & FLAG_C);
     cpu -> a -= (1 - carry);
     uint8_t resta, aux_a = cpu -> a;
@@ -1632,279 +1986,4 @@ void SBC (int mode, uint8_t value1, uint8_t value2) {
     total = aux_a - resta;
     flagC(total);
     flagV(aux_a, resta, total);
-}
-
-/*
-SEC  Set Carry Flag
-
-    1 -> C                      N Z C I D V
-                                - - 1 - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    implied       SEC          38    1    2
-*/
-void SEC(){
-    (cpu -> pc) += 1;
-    set_flag(FLAG_C, 1);
-}
-
-/*
-SED  Set Decimal Flag
-
-    1 -> D                      N Z C I D V
-                                - - - - 1 -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    implied       SED          F8    1    2
-*/
-void SED(){
-    (cpu -> pc) += 1;
-    set_flag(FLAG_D, 1);
-}
-
-/*
-SEI  Set Interrupt Disable Status
-
-    1 -> I                      N Z C I D V
-                                - - - 1 - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    implied       SEI          78    1    2
-*/
-void SEI(){
-    (cpu -> pc) += 1;
-    set_flag(FLAG_I, 1);
-}
-
-/*
-STA  Store Accumulator in Memory
-
-    A -> M                      N Z C I D V
-                                - - - - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    zeropage      STA oper     85    2    3
-    zeropage,X    STA oper,X   95    2    4
-    absolute      STA oper     8D    3    4
-    absolute,X    STA oper,X   9D    3    5
-    absolute,Y    STA oper,Y   99    3    5
-    (indirect,X)  STA (oper,X) 81    2    6
-    (indirect),Y  STA (oper),Y 91    2    6
-*/
-void STA(int mode ,uint8_t value1, uint8_t value2){
-    int position, position1, position2;
-    position = (value2 << 8) + value1;
-    if (value2 == 0xff || value2 == 0x01){
-        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
-        return;
-    }
-    switch (mode){
-        case M_PCERO:
-            mem -> ram[value1] = cpu -> a;
-            cpu -> pc += 2;
-            break;
-
-        case M_PCEROX:
-            mem -> ram[(value1 + cpu -> x)& 0x00FF] = cpu -> a;
-            (cpu -> pc) += 2;
-            break;
-
-        case M_ABSOLUTO:
-            mem -> ram[position] = cpu -> a;
-            (cpu -> pc) += 3;
-            break;
-
-        case M_INDICEX:
-            mem -> ram[position + cpu -> x] = cpu -> a;
-            cpu -> pc += 3;
-            break;
-
-        case M_INDICEY:
-            mem -> ram[position + cpu -> y] = cpu -> a;
-            cpu -> pc += 3;
-            break;
-
-        case M_INDINDEX:
-            position1 = mem -> ram[value1];
-            position2 = mem -> ram[value1 + 1];
-            position = (position2 << 8) + position1;
-            mem -> ram [mem -> ram[position + cpu -> y]] = cpu -> a;
-            cpu -> pc += 2;
-            break;
-
-        case M_INDEXINDI:
-            position1 = mem -> ram[value1 + cpu -> x];
-            position2 = mem -> ram[value1 + cpu -> x + 1];
-            position = (position2 << 8) + position1;
-            mem -> ram[mem -> ram[position]] = cpu -> a;
-            cpu -> pc += 2;
-            break;
-    }
-}
-
-/*
-STX  Store Index X in Memory
-
-    X -> M                      N Z C I D V
-                                - - - - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    zeropage      STX oper     86    2    3
-    zeropage,Y    STX oper,Y   96    2    4
-    absolute      STX oper     8E    3    4
-*/
-void STX (int mode, uint8_t value1, uint8_t value2) {
-    int position;
-    position = (value2 << 8) + value1;
-    if (value2 == 0xff || value2 == 0x01){
-        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
-        return;
-    }
-    switch (mode)
-    {
-        case M_PCERO:
-            mem -> ram[value1] = cpu -> x;
-            (cpu -> pc) += 2;
-            break;
-
-        case M_PCEROY:
-            mem -> ram[(value1 + cpu -> y) & 0x00FF] = cpu -> x;
-            (cpu -> pc) += 2;
-            break;
-
-        case M_ABSOLUTO:
-            mem -> ram[position] = cpu -> x;
-            (cpu -> pc) += 3;
-            break;
-    }
-}
-
-/*
-STY  Sore Index Y in Memory
-
-    Y -> M                      N Z C I D V
-                                - - - - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    zeropage      STY oper     84    2    3
-    zeropage,X    STY oper,X   94    2    4
-    absolute      STY oper     8C    3    4
-*/
-void STY(int mode, uint8_t value1, uint8_t value2){
-    int position;
-    position = (value2 << 8) + value1;
-    if (value2 == 0xff || value2 == 0x01){
-        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
-        return;
-    }
-    switch(mode){
-        case M_PCERO :
-            mem -> ram[value1] = cpu -> y;
-            (cpu -> pc) +=2;
-            break;
-
-        case M_PCEROX :
-            mem -> ram[(value1 + cpu -> x) & 0x00FF] = cpu -> y;
-            (cpu -> pc) +=2;
-            break;
-
-        case M_ABSOLUTO :
-            mem -> ram[position] = cpu -> y;
-            (cpu -> pc) +=3;
-            break;
-    }
-}
-
-/*
-TAX  Transfer Accumulator to Index X
-
-    A -> X                      N Z C I D V
-                                + + - - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    implied       TAX          AA    1    2
-*/
-void TAX(){
-    (cpu -> x) = (cpu -> a);
-    flagN(cpu -> x);
-    flagZ(cpu -> x);
-    (cpu -> pc) += 1;
-}
-
-/*
-TAY  Transfer Accumulator to Index Y
-
-    A -> Y                      N Z C I D V
-                                + + - - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    implied       TAY          A8    1    2
-*/
-void TAY(){
-    (cpu -> y) = (cpu -> a);
-    flagN(cpu -> y);
-    flagZ(cpu -> y);
-    (cpu -> pc) += 1;
-}
-
-/*
-TSX  Transfer Stack Pointer to Index X
-
-    SP -> X                     N Z C I D V
-                                + + - - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    implied       TSX          BA    1    2
-*/
-void TSX(){
-    (cpu -> pc) += 1;
-    (cpu -> x) = (cpu -> sp);
-    flagN(cpu -> x);
-    flagZ(cpu -> x);
-}
-
-/*
-TXA  Transfer Index X to Accumulator
-
-    X -> A                      N Z C I D V
-                                + + - - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    implied       TXA          8A    1    2
-*/
-void TXA(){
-    (cpu -> a) = (cpu -> x);
-    flagN(cpu -> a);
-    flagZ(cpu -> a);
-    (cpu -> pc) +=1;
-}
-
-/*
-TXS  Transfer Index X to Stack Register
-
-    X -> SP                     N Z C I D V
-                                - - - - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    implied       TXS          9A    1    2
-*/
-void TXS(){
-    (cpu -> sp) = (cpu -> x);
-    (cpu -> pc) += 1;
-}
-
-/*
-TYA  Transfer Index Y to Accumulator
-
-    Y -> A                      N Z C I D V
-                                + + - - - -
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    implied       TYA          98    1    2
-*/
-void TYA(){
-    (cpu -> a) = (cpu -> y);
-    flagN(cpu -> a);
-    flagZ(cpu -> a);
-    (cpu -> pc) += 1;
 }
