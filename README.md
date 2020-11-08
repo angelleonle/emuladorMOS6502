@@ -15,6 +15,8 @@ Alternativamente, **puede usar el archivo HEXDump.sh para leer el archivo Progra
 
 >bash HEXDump.sh
 
+
+
 Una vez generado el archivo HEXDump.txt con la ejecución del programa anterior, compile el emulador mediante el siguiente comando:
 
 >gcc -g MOS6502Emulator.c structures.c extra_functions.c instructions.c pipeline.c -o MOS6502
