@@ -11,10 +11,18 @@ Su ejecución se lleva a cabo mediante el siguiente comando, donde ProgramCode.a
 
 >./HEXDump ProgramCode.asm
 
-Adicionalmente **puede usar el archivo HEXDump.sh para leer el archivo ProgramCode.asm de prueba que se incluye en este repositorio**
+Alternativamente, **puede usar el archivo HEXDump.sh para leer el archivo ProgramCode.asm de prueba que se incluye en este repositorio**
 
 >bash HEXDump.sh
 
-Una vez generado el archivo HEXDump.txt, **use el archivo Emulator.sh para ejecutar el emulador**. Este archivo contiene las instrucciones necesarias para enlazar y compilar los archivos que forman parte del proyecto
+Una vez generado el archivo HEXDump.txt con la ejecución del programa anterior, compile el emulador mediante el siguiente comando:
+
+>gcc -g MOS6502Emulator.c structures.c extra_functions.c instructions.c pipeline.c -o MOS6502
+
+Y ejecute mediante el siguiente comando:
+
+>./MOS6502
+
+Alternativamente, **puede usar el rchivo Emulator.sh para compilar y ejecutar el emulador**.
 
 >bash Emulator.sh
