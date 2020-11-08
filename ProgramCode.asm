@@ -1,7 +1,0 @@
-_loop:
-LDA #6
-STA $0400
-DEC $0400
-DEC $0400
-LDA #4
-CMP $0400
