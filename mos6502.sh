@@ -1,2 +1,2 @@
-gcc -g main.c estructuras.c extra_functions.c flags_modes.c instructions.c pipeline_6502.c -o mos6502
-./mos6502
+gcc -g MOS6502Emulator.c structures.c extra_functions.c instructions.c pipeline.c -o MOS6502
+./MOS6502
