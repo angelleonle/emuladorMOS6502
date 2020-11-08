@@ -21,8 +21,3 @@ typedef struct memory
     uint8_t *rom;
     uint8_t *gpio;
 } memory;
-
-/**** VARIABLES GLOBALES DEL 6502 ****/
-mos6502 *cpu;
-memory *mem;
-
