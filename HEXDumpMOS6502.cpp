@@ -64,7 +64,7 @@ typedef struct RelativeMatrix
 }
 RelativeMatrix;
 
-RelativeMatrix *relmatrix = (RelativeMatrix *) new RelativeMatrix;
+RelativeMatrix *relmatrix;
 
 ifstream readFile(char *);
 int readString(ifstream &, char *&, char);
@@ -429,7 +429,14 @@ int getInstruction(ifstream &myfile, void *instructions, int &n, uint8_t auxRegi
         char *tagname;
         myfile.unget();
         readString(myfile, tagname, ' ');
+        if(!strcmp(upname,"JMP") || !strcmp(upname,"JSR"))
+        {
+        modeCode = M_ABSOLUTE;
+        }
+        else
+        {
         modeCode = M_RELATIVE;
+        }
         int aux  = findRelativeTag(tagname);
         number = aux - n - 2;
     }
@@ -571,7 +578,14 @@ int getTag(ifstream &myfile, void *instructions, int &n)
     }
     else if (c == '_')
     {
+        if(!strcmp(upname,"JMP") || !strcmp(upname,"JSR"))
+        {
+        modeCode = M_ABSOLUTE;
+        }
+        else
+        {
         modeCode = M_RELATIVE;
+        }
     }
     else
     {
@@ -676,16 +690,16 @@ void printHEXDumpReport(uint8_t *programCode, int n)
 
 int main(int argc, char *argv[])
 {
-    if(argc != 2)
-    {
-        cout << "Debe pasar el nombre del archivo .ASM" << endl;
-        exit(1);
-    }
     void *instructions;
     uint8_t *programCode;
+    relmatrix = (RelativeMatrix *) new RelativeMatrix;
     storageInstructions(instructions);
     printInstructionReport(instructions);
-    int n = generateHEXDump(instructions, programCode, argv[1]);
+    int n = generateHEXDump(instructions, programCode, "ProgramCode.asm");
     printHEXDumpReport(programCode, n);
+    for(int i = 0; i < (relmatrix -> n); i++)
+    {
+        printf("%s %04x\n", (int) (relmatrix -> tag)[i], (relmatrix -> direction)[i]);
+    }
     return 0;
 }
