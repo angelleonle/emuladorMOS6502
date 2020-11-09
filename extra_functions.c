@@ -191,10 +191,13 @@ void printf_memory()
     printf("                       MEMORIA\n");
     print_caracter('-', 55);
     printf("Página Cero (Registers)\n");
-    print_memory(0x0000, 5);
+    print_memory(0x0000, 4);
     printf("Página Uno (Stack)\n");
-    print_memory(0x0100, 5);
+    print_memory(0x0100, 4);
+    printf("Página Cuatro (Storage)\n");
+    print_memory(0x0400, 4);
+    print_caracter('-', 55);
     printf("Página Seis (Instructions)\n");
-    print_memory(0x0600, 5);
+    print_memory(0x0600, 6);
     print_caracter('-', 55);
 }
