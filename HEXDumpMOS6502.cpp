@@ -697,9 +697,5 @@ int main(int argc, char *argv[])
     printInstructionReport(instructions);
     int n = generateHEXDump(instructions, programCode, "ProgramCode.asm");
     printHEXDumpReport(programCode, n);
-    for(int i = 0; i < (relmatrix -> n); i++)
-    {
-        printf("%s %04x\n", (int) (relmatrix -> tag)[i], (relmatrix -> direction)[i]);
-    }
     return 0;
 }
