@@ -194,9 +194,7 @@ void printf_memory()
     print_memory(0x0000, 5);
     printf("Página Uno (Stack)\n");
     print_memory(0x0100, 5);
-    printf("Página Tres (Instructions)\n");
-    print_memory(0x0300, 5);
-    printf("Página Cuatro (Storage)\n");
-    print_memory(0x0400, 5);
+    printf("Página Seis (Instructions)\n");
+    print_memory(0x0600, 5);
     print_caracter('-', 55);
 }

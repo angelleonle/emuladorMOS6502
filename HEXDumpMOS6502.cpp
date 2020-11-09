@@ -441,7 +441,7 @@ int getInstruction(ifstream &myfile, void *instructions, int &n, uint8_t auxRegi
 
         if(!strcmp(upname,"JMP") || !strcmp(upname,"JSR"))
         {
-            number = aux;
+            number = 0x0600 + aux;
         }
         else
         {
