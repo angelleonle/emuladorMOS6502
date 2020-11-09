@@ -431,14 +431,22 @@ int getInstruction(ifstream &myfile, void *instructions, int &n, uint8_t auxRegi
         readString(myfile, tagname, ' ');
         if(!strcmp(upname,"JMP") || !strcmp(upname,"JSR"))
         {
-        modeCode = M_ABSOLUTE;
+            modeCode = M_ABSOLUTE;
         }
         else
         {
-        modeCode = M_RELATIVE;
+            modeCode = M_RELATIVE;
         }
         int aux  = findRelativeTag(tagname);
-        number = aux - n - 2;
+
+        if(!strcmp(upname,"JMP") || !strcmp(upname,"JSR"))
+        {
+            number = aux;
+        }
+        else
+        {
+            number = aux - n - 2;
+        }
     }
     else
     {
