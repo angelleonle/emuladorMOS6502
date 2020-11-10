@@ -1,8 +1,8 @@
-# emuladorMOS6502 Equipo 03 (OAC)
+# Emulador MOS6502 (Equipo 03 - OAC)
 
 **Este repositorio contiene el emulador MOS6502 realizado por estudiantes de la Pontificia Universidad Católica del Perú como parte del curso Organización y Arquitectura de Computadoras**
 
-**## Programa de prueba**
+## Programa de prueba
 El programa de prueba ProgramCode.asm es un programa sencillo que copia 48 veces en la memoria el número 5, a partir de la dirección $0400.
 
 ## Generador de datos de volcado hexadecimal en memoria
@@ -20,7 +20,7 @@ Alternativamente, **puede usar el archivo HEXDump.sh para leer el archivo Progra
 >bash HEXDump.sh
 
 
-**## Emulador**
+## Emulador
 Una vez generado el archivo HEXDump.txt con la ejecución del programa anterior, compile el emulador mediante el siguiente comando:
 
 >gcc -g MOS6502Emulator.c structures.c extra_functions.c instructions.c pipeline.c -o MOS6502
