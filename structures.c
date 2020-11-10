@@ -17,9 +17,6 @@ typedef struct mos6502
 typedef struct memory
 {
     uint8_t *ram;
-    //eso lo vamos a colocar nosotros
-    uint8_t *rom;
-    uint8_t *gpio;
 } memory;
 
 /**** VARIABLES GLOBALES DEL 6502 ****/
