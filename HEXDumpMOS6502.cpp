@@ -441,7 +441,7 @@ int getInstruction(ifstream &myfile, void *instructions, int &n, uint8_t auxRegi
 
         if(!strcmp(upname,"JMP") || !strcmp(upname,"JSR"))
         {
-            number = 0x0600 + aux;
+            number = aux;
         }
         else
         {
@@ -489,6 +489,7 @@ int getInstruction(ifstream &myfile, void *instructions, int &n, uint8_t auxRegi
             }
             else
             {
+                myfile.unget();
                 modeCode = M_PZERO;
             }
         }
@@ -705,5 +706,9 @@ int main(int argc, char *argv[])
     printInstructionReport(instructions);
     int n = generateHEXDump(instructions, programCode, "ProgramCode.asm");
     printHEXDumpReport(programCode, n);
+    for(int i = 0; i < (relmatrix -> n); i++)
+    {
+        printf("%s %04x\n", (int) (relmatrix -> tag)[i], (relmatrix -> direction)[i]);
+    }
     return 0;
 }
