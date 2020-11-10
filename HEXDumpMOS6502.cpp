@@ -704,7 +704,7 @@ int main(int argc, char *argv[])
     relmatrix = (RelativeMatrix *) new RelativeMatrix;
     storageInstructions(instructions);
     printInstructionReport(instructions);
-    int n = generateHEXDump(instructions, programCode, "ProgramCode.asm");
+    int n = generateHEXDump(instructions, programCode, argv[1]);
     printHEXDumpReport(programCode, n);
     return 0;
 }
