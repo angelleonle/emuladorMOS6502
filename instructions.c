@@ -1435,22 +1435,22 @@ void ROL(int mode, uint8_t value1, uint8_t value2){
             break;
         case M_PCERO :
             numUlt=(mem -> ram[ value1] & 0b10000000);
-            cpu -> a =  ((mem -> ram[value1]) << 1) + (carry);
+            (mem -> ram[value1]) =  ((mem -> ram[value1]) << 1) + (carry);
             (cpu ->pc) += 2;
             break;
         case M_PCEROX :
             numUlt=(mem -> ram[(value1 + cpu -> x) & 0x00FF] & 0b10000000);
-            cpu -> a  = ((mem -> ram[(value1 + cpu -> x) & 0x00FF]) << 1) + (carry);
+            (mem -> ram[(value1 + cpu -> x) & 0x00FF])  = ((mem -> ram[(value1 + cpu -> x) & 0x00FF]) << 1) + (carry);
             (cpu -> pc) += 2;
             break;
         case M_ABSOLUTO :
             numUlt = (mem -> ram[position] & 0b10000000);
-            cpu -> a = ((mem -> ram[position]) << 1) + (carry);
+            (mem -> ram[position]) = ((mem -> ram[position]) << 1) + (carry);
             (cpu -> pc) += 3;
             break;
         case M_INDICEX :
             numUlt=(mem -> ram[(position + cpu ->x) ] & 0b10000000);
-            cpu -> a = ((mem -> ram[position + cpu -> x]) << 1 ) + (carry);
+            (mem -> ram[position + cpu -> x]) = ((mem -> ram[position + cpu -> x]) << 1 ) + (carry);
             (cpu -> pc) += 3;
             break;
     }
@@ -1485,30 +1485,30 @@ void ROR(int mode, uint8_t value1, uint8_t value2){
         case M_ACUMULADOR: // ROR  del acumulador
             numUlt = (cpu -> a & FLAG_C);
             cpu -> a = (carry << 7) + (cpu -> a >> 1);
-            (cpu -> pc) +=1;
+            (cpu -> pc) += 1;
             break;
 
         case M_PCERO :
             numUlt = (mem -> ram[value1] & FLAG_C);
-            cpu -> a = (carry << 7) + ((mem -> ram[value1]) >> 1);
-            (cpu -> pc) +=2;
+            (mem -> ram[value1]) = (carry << 7) + ((mem -> ram[value1]) >> 1);
+            (cpu -> pc) += 2;
             break;
 
         case M_PCEROX :
             numUlt = (mem -> ram[( value1 + cpu -> x) & 0x00FF] & FLAG_C);
-            cpu -> a = (carry << 7) + ((mem -> ram[value1 + cpu -> x])>> 1);
-            (cpu -> pc) +=2;
+            (mem -> ram[value1 + cpu -> x]) = (carry << 7) + ((mem -> ram[value1 + cpu -> x]) >> 1);
+            (cpu -> pc) += 2;
             break;
 
         case M_ABSOLUTO :
             numUlt = (mem -> ram[position] & FLAG_C);
-            cpu -> a = (carry << 7 ) + ((mem -> ram[position]) >> 1);
+            (mem -> ram[position]) = (carry << 7 ) + ((mem -> ram[position]) >> 1);
             (cpu -> pc) += 3;
             break;
 
         case M_INDICEX :
             numUlt=(mem -> ram[( position + cpu ->x) ] & FLAG_C);
-            cpu -> a = (carry << 7) + ((mem -> ram[ position + cpu ->x]) >> 1);
+            (mem -> ram[ position + cpu ->x]) = (carry << 7) + ((mem -> ram[ position + cpu ->x]) >> 1);
             (cpu -> pc) += 3;
             break;
     }

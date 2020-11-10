@@ -13,12 +13,10 @@ int main()
     mem -> ram[RESET_LSB - 1] = 0x00;
     reset_cpu(); // Reseteamos la cpu
     int n = loadToMemory((uint16_t) 0x0600);
-
     printf("Antes de la ejecución\n");
     printf_registers();
     printf_memory();
     print_memory_report("MemoryBefore.txt");
-
     while(((cpu -> pc) - 0x0600) != n)
     {
         fetch();
