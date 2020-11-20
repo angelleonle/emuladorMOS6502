@@ -310,6 +310,40 @@ void BEQ(uint8_t displacement)
 }
 
 /*
+BIT  Test Bits in Memory with Accumulator
+
+    bits 7 and 6 of operand are transfered to bit 7 and 6 of SR (N,V);
+    the zeroflag is set to the result of operand AND accumulator.
+    A AND M, M7 -> N, M6 -> V       N Z C I D V
+                                   M7 + - - - M6
+    addressing    assembler    opc  bytes  cyles
+    --------------------------------------------
+    zeropage      BIT oper     24    2    3
+    absolute      BIT oper     2C    3    4
+*/
+void BIT(int mode ,uint8_t value1, uint8_t value2){
+    int position = (value2 << 8 ) + value1;
+    if (value2 == 0xff || value2 == 0x01){
+        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
+        return;
+    }
+    uint8_t memory_value;
+    switch (mode){
+        case M_PCERO:
+            memory_value = mem -> ram[value1];
+            cpu -> pc += 2;
+            break;
+        case M_ABSOLUTO:
+            memory_value = mem -> ram[position];
+            (cpu -> pc) += 3;
+            break;
+    }
+    set_flag(FLAG_V, (memory_value & 0b01000000));
+    set_flag(FLAG_N, (memory_value & 0b10000000));
+    flagZ( cpu -> a & memory_value );
+}
+
+/*
 BMI  Branch on Result Minus
 
     branch on N = 1               N Z C I D V
@@ -443,40 +477,6 @@ void BVS(uint8_t displacement)
     else{
         (cpu -> pc) += 2;
     }
-}
-
-/*
-BIT  Test Bits in Memory with Accumulator
-
-    bits 7 and 6 of operand are transfered to bit 7 and 6 of SR (N,V);
-    the zeroflag is set to the result of operand AND accumulator.
-    A AND M, M7 -> N, M6 -> V       N Z C I D V
-                                   M7 + - - - M6
-    addressing    assembler    opc  bytes  cyles
-    --------------------------------------------
-    zeropage      BIT oper     24    2    3
-    absolute      BIT oper     2C    3    4
-*/
-void BIT(int mode ,uint8_t value1, uint8_t value2){
-    int position = (value2 << 8 ) + value1;
-    if (value2 == 0xff || value2 == 0x01){
-        printf("No se puede acceder a la página uno (0x01) o 256 (0xff) \n");
-        return;
-    }
-    uint8_t memory_value;
-    switch (mode){
-        case M_PCERO:
-            memory_value = mem -> ram[value1];
-            cpu -> pc += 2;
-            break;
-        case M_ABSOLUTO:
-            memory_value = mem -> ram[position];
-            (cpu -> pc) += 3;
-            break;
-    }
-    set_flag(FLAG_V, (memory_value & 0b01000000));
-    set_flag(FLAG_N, (memory_value & 0b10000000));
-    flagZ( cpu -> a & memory_value );
 }
 
 /*
