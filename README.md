@@ -18,7 +18,7 @@ Su ejecución se lleva a cabo mediante el siguiente comando, donde ProgramCode.a
 
 >./HEXDump ProgramCode.asm
 
-Alternativamente, **puede usar el archivo HEXDump.sh para leer el archivo ProgramCode.asm de prueba que se incluye en este repositorio**
+Alternativamente, **puede usar el archivo HEXDump.sh para leer el archivo Factorial.asm de prueba que se incluye en este repositorio**
 
 >bash HEXDump.sh
 
