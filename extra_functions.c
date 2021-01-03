@@ -225,19 +225,19 @@ int leerTecla()
     {
         return 1;
     }
-    else if (ch == 'w')
+    else if (ch == 'w' || ch == 'w')
     {
         mem -> ram[0xff] = (uint8_t) 'W';
     }
-    else if (ch == 'd')
+    else if (ch == 'd' || ch == 'D')
     {
         mem -> ram[0xff] = (uint8_t) 'D';
     }
-    else if (ch == 's')
+    else if (ch == 's' || ch == 'S')
     {
         mem -> ram[0xff] = (uint8_t) 'S';
     }
-    else if (ch == 'a')
+    else if (ch == 'a' || ch == 'A')
     {
         mem -> ram[0xff] = (uint8_t) 'A';
     }
