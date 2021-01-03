@@ -37,7 +37,7 @@ int main()
     init_pair(4, COLOR_BLUE, COLOR_BLUE);
     attron(COLOR_PAIR(1));
 
-    timeout(10);
+    timeout(0.005);
     while(((cpu -> pc) - 0x0600) != n)
     {
         // Leer tecla
@@ -48,22 +48,18 @@ int main()
         }
         // Generar número aleatorio
         generateRandom();
+        // Pipeline
         fetch();
         decode();
         execute();
+        // Salida a pantalla
         printGameSpace();
     }
-    delay(10000);
+    delay(100);
     endwin();
     printf("Game Over\n");
     set_flag(FLAG_B, 1);
     set_flag(0b00100000, 1);
-/*    
-    printf("Después de la ejecución\n");
-    printf_registers();
-    printf_memory();
-    print_memory_report("MemoryAfter.txt");*/
-
     return 0;
 }
 
