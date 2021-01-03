@@ -31,7 +31,7 @@ int main()
     keypad(stdscr,1);
     cbreak();
     start_color();
-    init_pair(1, COLOR_BLACK, COLOR_BLACK);
+    init_pair(1, COLOR_CYAN, COLOR_CYAN);
     init_pair(2, COLOR_GREEN, COLOR_GREEN);
     init_pair(3, COLOR_RED, COLOR_RED);
     init_pair(4, COLOR_BLUE, COLOR_BLUE);
@@ -41,9 +41,9 @@ int main()
     while(((cpu -> pc) - 0x0600) != n)
     {
         // Leer tecla
-
         if(leerTecla())
         {
+            endwin();
             break;
         }
         // Generar número aleatorio
@@ -53,8 +53,9 @@ int main()
         execute();
         printGameSpace();
     }
-    delay(5000);
+    delay(10000);
     endwin();
+    printf("Game Over\n");
     set_flag(FLAG_B, 1);
     set_flag(0b00100000, 1);
 /*    
@@ -101,7 +102,7 @@ void printGameSpace()
             else
             {
                 attron(COLOR_PAIR(1));
-                printw("   ");
+                printw("00 ");
             }
         }
         printw("\n");

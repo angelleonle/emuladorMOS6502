@@ -104,10 +104,6 @@ int loadToMemory(uint16_t init_pc)
         printf("Something went wrong\n");
         exit(1);
     }
-    else
-    {
-        printf("File HEXDump.txt was opened successfully.\n");
-    }
     
     int i = 0;
     unsigned int aux;
@@ -227,24 +223,23 @@ int leerTecla()
     int ch = getch();
     if (ch == 'e')
     {
-        endwin();
         return 1;
     }
     else if (ch == 'w')
     {
-        mem -> ram[0xff] = 'w';
+        mem -> ram[0xff] = (uint8_t) 'W';
     }
     else if (ch == 'd')
     {
-        mem -> ram[0xff] = 'd';
+        mem -> ram[0xff] = (uint8_t) 'D';
     }
     else if (ch == 's')
     {
-        mem -> ram[0xff] = 's';
+        mem -> ram[0xff] = (uint8_t) 'S';
     }
     else if (ch == 'a')
     {
-        mem -> ram[0xff] = 'a';
+        mem -> ram[0xff] = (uint8_t) 'A';
     }
     return 0;
 }
