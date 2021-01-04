@@ -96,9 +96,9 @@ void printf_registers()
     print_caracter('-', 33);
 }
 
-int loadToMemory(uint16_t init_pc)
+int loadToMemory(uint16_t init_pc, const char *myFile)
 {
-    FILE *hexdump = fopen("HEXDump.txt","r");
+    FILE *hexdump = fopen(myFile,"r");
     if(hexdump == NULL)
     {
         printf("Something went wrong\n");
@@ -221,7 +221,7 @@ void generateRandom()
 int leerTecla()
 {
     int ch = getch();
-    if (ch == 'e')
+    if (ch == 'e' || ch == 'E')
     {
         return 1;
     }

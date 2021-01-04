@@ -6,7 +6,8 @@ JSR inicializarSerpiente
 JSR dibujarSerpiente
 JSR generarNuevaManzana
 JSR dibujarManzana
-
+LDA #4
+STA $0357
 
 loopJuego:
 	JSR revisarTamanoMaximo
@@ -81,7 +82,7 @@ delay:
 			CPY #$ff
 		BNE _dl2
 		INX
-		CPX #$04
+		CPX $0357
 	BNE _dl1
 RTS
 
@@ -119,12 +120,6 @@ RTS
 generarNuevaManzana:
 	LDA $fe
 	STA $0354
-RTS
-
-borrarManzana:
-	LDA #0
-	LDX $0354
-	STA $0500, X
 RTS
 
 dibujarManzana:

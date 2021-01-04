@@ -19,7 +19,7 @@ void printf_binary(int, int);
 void print_Registros();
 void print_caracter(char, int);
 void printf_registers();
-int loadToMemory(uint16_t);
+int loadToMemory(uint16_t, const char *);
 void init();
 void reset_cpu();
 void print_memory_report(char *);
