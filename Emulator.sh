@@ -1,2 +1,2 @@
-gcc -g MOS6502Emulator.c structures.c extra_functions.c instructions.c pipeline.c -lncurses -o MOS6502
-./MOS6502
+gcc -g SnakeEmulator.c structures.c extra_functions.c instructions.c pipeline.c -lncurses -o SnakeGame
+./SnakeGame
