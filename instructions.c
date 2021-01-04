@@ -965,10 +965,10 @@ INY  Increment Index Y by One
 */
 void INY()
 {
-    (cpu -> y) += 1;
+    (cpu -> pc) += 1;
+    (cpu -> y) = (cpu -> y) + 1;
     flagN(cpu -> y);
     flagZ(cpu -> y);
-    (cpu -> pc) += 1;
 }
 
 /*

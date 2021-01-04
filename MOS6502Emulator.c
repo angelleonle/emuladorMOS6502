@@ -37,7 +37,7 @@ int main()
     init_pair(4, COLOR_BLUE, COLOR_BLUE);
     attron(COLOR_PAIR(1));
 
-    timeout(0.01);
+    timeout(0.1);
     while(((cpu -> pc) - 0x0600) != n)
     {
         // Leer tecla
