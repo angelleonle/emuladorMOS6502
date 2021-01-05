@@ -33,9 +33,10 @@ int main()
     cbreak();
     start_color();
     init_pair(1, COLOR_CYAN, COLOR_CYAN);
-    init_pair(2, COLOR_GREEN, COLOR_GREEN);
+    init_pair(2, COLOR_BLUE, COLOR_BLUE);
     init_pair(3, COLOR_RED, COLOR_RED);
-    init_pair(4, COLOR_BLUE, COLOR_BLUE);
+    init_pair(4, COLOR_BLACK, COLOR_BLACK);
+    init_pair(5, COLOR_YELLOW, COLOR_BLACK);
     attron(COLOR_PAIR(1));
     timeout(0.1);
     while(((cpu -> pc) - 0x0600) != n)
@@ -58,7 +59,7 @@ int main()
     delay(100);
     endwin();
     printf("Pong: Game Over\n");
-    printf("Obtuviste: %i puntos\n", mem -> ram []);
+//    printf("Obtuviste: %i puntos\n", mem -> ram []);
     set_flag(FLAG_B, 1);
     set_flag(0b00100000, 1);
     return 0;
@@ -78,7 +79,13 @@ void printGameSpace()
     {
         for (int j = 0; j < MAX_COLUMNS; j++)
         {
-            if (((mem -> ram)[0x500 + i * MAX_COLUMNS + j]) == 1)
+            if((i * MAX_COLUMNS + j) == 7 || (i * MAX_COLUMNS + j) == 8)
+            {
+                attron(COLOR_PAIR(5));
+                printw("%2i ", ((mem -> ram)[0x500 + i * MAX_COLUMNS + j]));
+                attron(COLOR_PAIR(1));
+            }
+            else if (((mem -> ram)[0x500 + i * MAX_COLUMNS + j]) == 1)
             {
                 attron(COLOR_PAIR(2));
                 printw("11 ");
@@ -86,28 +93,34 @@ void printGameSpace()
             }
             else if (((mem -> ram)[0x500 + i * MAX_COLUMNS + j]) == 2)
             {
-                attron(COLOR_PAIR(3));
-                printw("22 ");
                 attron(COLOR_PAIR(1));
+                printw("22 ");
             }
             else if (((mem -> ram)[0x500 + i * MAX_COLUMNS + j]) == 3)
             {
-                attron(COLOR_PAIR(4));
+                attron(COLOR_PAIR(3));
                 printw("33 ");
                 attron(COLOR_PAIR(1));
             }
             else if (((mem -> ram)[0x500 + i * MAX_COLUMNS + j]) == 4)
             {
-                attron(COLOR_PAIR(3));
-                printw("33 ");
+                attron(COLOR_PAIR(4));
+                printw("   ");
+                attron(COLOR_PAIR(1));
+            }
+            else if (((mem -> ram)[0x500 + i * MAX_COLUMNS + j]) == 5)
+            {
+                attron(COLOR_PAIR(2));
+                printw("55 ");
                 attron(COLOR_PAIR(1));
             }
             else
             {
                 attron(COLOR_PAIR(1));
-                printw("00 ");
+                printw("%2x ", ((mem -> ram)[0x500 + i * MAX_COLUMNS + j]));
             }
         }
+
         printw("\n");
     }
     refresh();

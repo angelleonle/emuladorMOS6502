@@ -836,7 +836,7 @@ void EOR(int mode, uint8_t value1, uint8_t value2){
 
     switch (mode) {
         case M_INMEDIATO:
-            cpu -> a = ((cpu -> a & (~value1)) | ((~cpu -> a) & value1));
+            cpu -> a = ((cpu -> a & (~value1)) | ((~(cpu -> a)) & value1));
             (cpu -> pc) +=2;
             break;
 
