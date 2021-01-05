@@ -2,38 +2,41 @@
 
 **Este repositorio contiene el emulador MOS6502 realizado por estudiantes de la Pontificia Universidad Católica del Perú como parte del curso Organización y Arquitectura de Computadoras**
 
-## Programas de prueba
-### Factorial
-El programa de prueba **Factorial.asm** es un programa que calcula el factorial de un número.
-### Copiar
-El programa de prueba **Copiar.asm** es un programa sencillo que copia 0x4F veces en la memoria el número 5, a partir de la dirección $0400.
+## Consideraciones del desarrollo de los juegos
+Para el desarrollo de la interfaz de los juegos Snake y Pong se empleó NCURSES, biblioteca que permite construir interfaces gráficas en la línea de comandos, por tanto, para compilar el programa es necesario instalar dicha biblioteca utilizando el siguiente comando:
 
-## Generador de datos de volcado hexadecimal en memoria
-Para utilizar el emulador es necesario compilar y ejecutar el programa HEXDump, el cual leerá un archivo de texto llamado **Instructions.txt** que contiene las instrucciones del MOS6502, y generá un archivo de reporte llamado **InstructionReport.txt** una vez que carguen las instrucciones en las estructuras necesarias. A continuación, el programa interpretará su archivo .ASM para MOS6502 basandose en el juego de instrucciones que se almacenó y generará un archivo de volcado hexadecimal llamado **HEXDump.txt**, que será leído por el programa emulador, el cual cargará estos datos a la memoria. Vale resaltar que **HEXDump es un programa simple que no es capaz de procesadar errores de sintaxis (fue desarrollado con el único fin de hacer pruebas)**, por lo que requiere que se maneje adecuadamente su formato y se coloque un salto de línea al final del archivo, y un espacio en blanco luego de las instrucciones con modo implícito o relativo (y absoluto con una etiqueta en el caso de JMP y JSR). Así mismo, el archivo .ASM de entrada debe de usar como End Sequence **LF si se ejecuta en Linux** o **CRLF si se ejecuta en Windows** (El archivo .ASM de prueba proporcionado funciona para Linux).
-La compilación del programa que generará el volcado hexadecimal se realiza mediante el siguiente comando:
+>sudo apt-get install libncurses5-dev libncursesw5-dev
 
->gcc HEXDumpMOS6502.cpp -lstdc++ -o HEXDump
+** También se incluyen en el repositorio ejecutables ya compilados de los programas (SnakeGame y PongGame), los cuales pueden utilizarse para probar los juegos.
 
-Su ejecución se lleva a cabo mediante el siguiente comando, donde ProgramCode.asm es el archivo .ASM que desea leer:
+- El código ASM de los juegos se encuentra en los archivos SnakeGame.asm y PongGame.asm
 
->./HEXDump ProgramCode.asm
+- El volcado hexadecimal de las instrucciones se encuentra en los archivos HEXDumpSnake.txt y HEXDumpPong.txt
 
-Alternativamente, **puede usar el archivo HEXDump.sh para leer el archivo Factorial.asm de prueba que se incluye en este repositorio**
+- El archivo SnakeEmulator.c y PongEmulator.c son versiones modificados del módulo principal del emulador (MOS6502Emulator.c), presentado en la primera parte, con la diferencia de que aquí se incluye la interfaz gràfica.
 
->bash HEXDump.sh
+## Controles de los juegos
+**Los controles para Snake son:
 
+W: arriba
+A: izquierda
+S: abajo
+D: derecha
+E: salir del juego
+
+**Los controles para Pong son:
+
+A: izquierda
+D: derecha
+E: salir del juego
 
 ## Emulador
-Una vez generado el archivo HEXDump.txt con la ejecución del programa anterior, compile el emulador mediante el siguiente comando:
+Con el archivo HEXDump.txt, compile el emulador mediante el siguiente comando:
 
 >gcc -g MOS6502Emulator.c structures.c extra_functions.c instructions.c pipeline.c -o MOS6502
 
 Y ejecute mediante el siguiente comando:
 
 >./MOS6502
-
-Alternativamente, **puede usar el archivo Emulator.sh para compilar y ejecutar el emulador**.
-
->bash Emulator.sh
 
 El compilador mostrará fragmentos de la memoria y los registros de la CPU antes y después de la ejecución del programa en ensamblador. Adicionalmente, generará dos archivos que contienen todos los datos de la memoria antes y después de la ejecución del programa en ensamblador llamados **MemoryBefore.txt** y **MemoryAfter.txt**
