@@ -1,4 +1,4 @@
-# Emulador MOS6502 (Equipo 03 - OAC)
+# Emulador MOS6502
 
 **Este repositorio contiene el emulador MOS6502 realizado por estudiantes de la Pontificia Universidad Católica del Perú como parte del curso Organización y Arquitectura de Computadoras**
 
