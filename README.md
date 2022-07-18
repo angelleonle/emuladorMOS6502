@@ -11,21 +11,21 @@
 >./MOS6502
 
 ## Compilación y ejecución de juegos
-**Snake:
+**Snake**:
 >bash SnakeGame.sh
 
-**Pong:
+**Pong**:
 >bash PongGame.sh
 
 ### Controles de los juegos
-**Snake:
+**Snake**:
 W: arriba
 A: izquierda
 S: abajo
 D: derecha
 E: salir del juego
 
-**Pong:
+**Pong**:
 A: izquierda
 D: derecha
 E: salir del juego
