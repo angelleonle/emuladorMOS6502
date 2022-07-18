@@ -1,6 +1,6 @@
 # Emulador MOS6502
 
-## Requerimientos:
+## Requerimientos
 **ncurses**: interfaces gráficas en la línea de comandos.
 >sudo apt-get install libncurses5-dev libncursesw5-dev
 
@@ -11,10 +11,13 @@
 >./MOS6502
 
 ## Compilación y ejecución de juegos
+**Snake:
 >bash SnakeGame.sh
+
+**Pong:
 >bash PongGame.sh
 
-### Controles de los juegos:
+### Controles de los juegos
 **Snake:
 W: arriba
 A: izquierda
